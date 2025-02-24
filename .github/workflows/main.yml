@@ -45,8 +45,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: | 
-              ghcr.io/bijay-shrestha/${{ github.repository }}:${{ env.DOCKER_TAG }}
-              ghcr.io/bijay-shrestha/${{ github.repository }}:latest
+              ghcr.io/bijay-shrestha/$bijay:${{ env.DOCKER_TAG }}
+              ghcr.io/bijay-shrestha/$bijay:latest
               
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -55,4 +55,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: | 
-              ghcr.io/bijay-shrestha/${{ github.repository }}:${{ env.GIT_BRANCH }}
+              ghcr.io/bijay-shrestha/$bijay:${{ env.GIT_BRANCH }}
