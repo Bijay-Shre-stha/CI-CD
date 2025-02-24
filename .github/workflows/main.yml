@@ -29,6 +29,8 @@ jobs:
       - name: Extract Git Metadata
         id: meta
         run: |
+          REPO_NAME_LOWER=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then
             TAG_NAME=${GITHUB_REF#refs/tags/}
             echo "DOCKER_TAG=$TAG_NAME" >> $GITHUB_ENV
@@ -39,6 +41,7 @@ jobs:
             echo "GIT_BRANCH=$BRANCH_NAME" >> $GITHUB_ENV
             echo "PUSH_LATEST=false" >> $GITHUB_ENV
           fi
+          echo "REPO_NAME_LOWER=$REPO_NAME_LOWER" >> $GITHUB_ENV
 
       - name: Build and push (Tagged release)
         uses: docker/build-push-action@v6
@@ -47,8 +50,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ env.DOCKER_TAG }}
-            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
+            ghcr.io/${{ github.repository_owner }}/${{ env.REPO_NAME_LOWER }}:${{ env.DOCKER_TAG }}
+            ghcr.io/${{ github.repository_owner }}/${{ env.REPO_NAME_LOWER }}:latest
 
       - name: Build and push (Branch-based)
         uses: docker/build-push-action@v6
@@ -57,4 +60,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ env.GIT_BRANCH }}
+            ghcr.io/${{ github.repository_owner }}/${{ env.REPO_NAME_LOWER }}:${{ env.GIT_BRANCH }}
