@@ -34,25 +34,27 @@ jobs:
             echo "DOCKER_TAG=$TAG_NAME" >> $GITHUB_ENV
             echo "PUSH_LATEST=true" >> $GITHUB_ENV
           else
-            echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+            BRANCH_NAME=${GITHUB_REF#refs/heads/}
+            BRANCH_NAME=${BRANCH_NAME//\//-}  # Replace slashes with dashes for valid tag
+            echo "GIT_BRANCH=$BRANCH_NAME" >> $GITHUB_ENV
             echo "PUSH_LATEST=false" >> $GITHUB_ENV
           fi
 
-      - name: Build and push
+      - name: Build and push (Tagged release)
         uses: docker/build-push-action@v6
         if: env.PUSH_LATEST == 'true'
         with:
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: | 
-              ghcr.io/bijay-shre-stha/$bijay:${{ env.DOCKER_TAG }}
-              ghcr.io/bijay-shre-stha/$bijay:latest
-              
-      - name: Build and push
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ env.DOCKER_TAG }}
+            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
+
+      - name: Build and push (Branch-based)
         uses: docker/build-push-action@v6
         if: env.PUSH_LATEST == 'false'
         with:
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: | 
-              ghcr.io/bijay-shre-stha/$bijay:${{ env.GIT_BRANCH }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ env.GIT_BRANCH }}
